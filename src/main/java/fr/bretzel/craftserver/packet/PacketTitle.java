@@ -47,6 +47,7 @@ public class PacketTitle extends Packet {
         init();
     }
 
+
     public PacketTitle(IChatSerializer msg, EnumTitle title, int fadeInTime, int stayTime, int fadeOutTime) {
         super(Bukkit.getServer());
 
