@@ -18,14 +18,16 @@ public class CraftPlayer  {
 
     private Player player;
     private GameProfile profile;
+    private CraftServer server;
 
     public CraftPlayer(Player player) {
         this.player = player;
-        profile = new GameProfile(player.getUniqueId(), player.getName());
+        this.profile = new GameProfile(player.getUniqueId(), player.getName());
+        this.server = new CraftServer(this.getPlayer().getServer());
     }
 
     private void setOp(boolean b) {
-
+        getServer().addOp(getGameProfile());
     }
 
     public GameProfile getGameProfile() {
@@ -73,7 +75,9 @@ public class CraftPlayer  {
         }
     }
 
-
+    public CraftServer getServer() {
+        return server;
+    }
 
     private Method getMethod(Class<?> clazz, String name, Class<?>... args) {
         for (Method m : clazz.getMethods())
