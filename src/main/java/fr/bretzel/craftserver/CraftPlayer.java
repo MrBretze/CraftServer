@@ -1,6 +1,7 @@
 package fr.bretzel.craftserver;
 
 
+import com.mojang.authlib.GameProfile;
 import fr.bretzel.craftserver.packet.PacketTitle;
 
 import org.bukkit.entity.Player;
@@ -16,11 +17,20 @@ import java.lang.reflect.Method;
 public class CraftPlayer  {
 
     private Player player;
+    private GameProfile profile;
 
     public CraftPlayer(Player player) {
         this.player = player;
+        profile = new GameProfile(player.getUniqueId(), player.getName());
     }
 
+    private void setOp(boolean b) {
+
+    }
+
+    public GameProfile getGameProfile() {
+        return profile;
+    }
 
     public void sendPacket(Packet packet) {
         try {
