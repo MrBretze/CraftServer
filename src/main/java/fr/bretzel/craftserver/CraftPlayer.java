@@ -26,7 +26,7 @@ public class CraftPlayer  {
         this.server = new CraftServer(this.getPlayer().getServer());
     }
 
-    private void setOp(boolean b) {
+    public void setOp(boolean b) {
         getServer().addOp(getGameProfile());
     }
 
