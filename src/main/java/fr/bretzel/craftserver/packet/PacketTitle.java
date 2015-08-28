@@ -4,6 +4,7 @@ import fr.bretzel.craftserver.Packet;
 import fr.bretzel.craftserver.util.ChatSerializer;
 import fr.bretzel.craftserver.util.EnumTitle;
 import fr.bretzel.craftserver.util.IChatSerializer;
+import fr.bretzel.craftserver.util.ReflectionUtil;
 import org.bukkit.Bukkit;
 
 /**
@@ -25,15 +26,7 @@ public class PacketTitle extends Packet {
     private Object packetTimings;
 
     public PacketTitle(IChatSerializer title, IChatSerializer subtitle) {
-        super(Bukkit.getServer());
-        this.title = title;
-        this.subtitle = subtitle;
-
-        fadeInTime = 20;
-        fadeOutTime = 20;
-        stayTime = 20;
-
-        init();
+        this(title, subtitle, 20, 20, 20);
     }
 
     public PacketTitle(IChatSerializer title, IChatSerializer subtitle, int fadeInTime, int stayTime, int fadeOutTime) {
@@ -85,22 +78,28 @@ public class PacketTitle extends Packet {
     private void init() {
         try {
 
-            Class<?> cpacket = getMinecraftServerClass("PacketPlayOutTitle");
+            Class<?> cpacket = ReflectionUtil.getMinecraftServerClass("PacketPlayOutTitle");
 
-            this.action = getMinecraftServerClass("PacketPlayOutTitle$EnumTitleAction").getEnumConstants();
+            String classNameEnum = "PacketPlayOutTitle$EnumTitleAction";
 
-            Object timings = cpacket.getConstructor(getMinecraftServerClass("PacketPlayOutTitle$EnumTitleAction"), ChatSerializer.getIChatBaseComponent(), Integer.TYPE, Integer.TYPE, Integer.TYPE)
+            if (ReflectionUtil.getBukkitVersion().equalsIgnoreCase("v1_8_R1")) {
+                classNameEnum = "EnumTitleAction";
+            }
+
+            this.action = ReflectionUtil.getMinecraftServerClass(classNameEnum).getEnumConstants();
+
+            Object timings = cpacket.getConstructor(ReflectionUtil.getMinecraftServerClass("PacketPlayOutTitle$EnumTitleAction"), ChatSerializer.getIChatBaseComponent(), Integer.TYPE, Integer.TYPE, Integer.TYPE)
                     .newInstance(action[2], null, fadeInTime, stayTime, fadeOutTime);
 
             setPacketTimings(timings);
 
-            Object titlePacket = cpacket.getConstructor(getMinecraftServerClass("PacketPlayOutTitle$EnumTitleAction"), ChatSerializer.getIChatBaseComponent())
+            Object titlePacket = cpacket.getConstructor(ReflectionUtil.getMinecraftServerClass("PacketPlayOutTitle$EnumTitleAction"), ChatSerializer.getIChatBaseComponent())
                     .newInstance(action[0], title.getJSonElement());
 
             setPacketTitle(titlePacket);
 
             if(subtitle != null) {
-                Object subtitle = cpacket.getConstructor(getMinecraftServerClass("PacketPlayOutTitle$EnumTitleAction"), ChatSerializer.getIChatBaseComponent())
+                Object subtitle = cpacket.getConstructor(ReflectionUtil.getMinecraftServerClass("PacketPlayOutTitle$EnumTitleAction"), ChatSerializer.getIChatBaseComponent())
                         .newInstance(action[1], this.subtitle.getJSonElement());
 
                 setPacketsubtitle(subtitle);
@@ -113,6 +112,10 @@ public class PacketTitle extends Packet {
 
     public Object getPacketTimings() {
         return packetTimings;
+    }
+
+    private void setPacketTimings(Object packetTimings) {
+        this.packetTimings = packetTimings;
     }
 
     public Object getTitlePacket() {
@@ -129,9 +132,5 @@ public class PacketTitle extends Packet {
 
     private void setPacketsubtitle(Object packetsubtitle) {
         this.packetsubtitle = packetsubtitle;
-    }
-
-    private void setPacketTimings(Object packetTimings) {
-        this.packetTimings = packetTimings;
     }
 }

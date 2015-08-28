@@ -1,8 +1,5 @@
 package fr.bretzel.craftserver.util;
 
-
-import fr.bretzel.craftserver.Packet;
-
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -35,25 +32,15 @@ public class ChatSerializer {
 
 
     private static void loadClass() {
-        chatSerializer = getMinecraftServerClass("IChatBaseComponent$ChatSerializer");
-        ibaseComponent = getMinecraftServerClass("IChatBaseComponent");
-    }
 
-    private static Class<?> getMinecraftServerClass(String name) {
-        try {
-            Class<?> clazz;
-            String version = Packet.getBukkitVersion();
+        String clazz = "IChatBaseComponent$ChatSerializer";
 
-            if(version.equalsIgnoreCase("v1_8_R1") && name.equalsIgnoreCase("IChatBaseComponent$ChatSerializer")) {
-                name = "ChatSerializer";
-            }
-            clazz = Class.forName("net.minecraft.server." + version + "." + name);
-            return clazz;
-
-        } catch (ClassNotFoundException e) {
-            e.fillInStackTrace();
+        if (ReflectionUtil.getBukkitVersion().equalsIgnoreCase("v1_8_R1")) {
+            clazz = "ChatSerializer";
         }
-        return null;
+
+        chatSerializer = ReflectionUtil.getMinecraftServerClass(clazz);
+        ibaseComponent = ReflectionUtil.getMinecraftServerClass("IChatBaseComponent");
     }
 
     public static Class<?> getChatSerializer() {

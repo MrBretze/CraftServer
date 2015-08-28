@@ -1,6 +1,7 @@
 package fr.bretzel.craftserver.packet;
 
 import fr.bretzel.craftserver.Packet;
+import fr.bretzel.craftserver.util.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -16,7 +17,7 @@ public class PacketRespawn extends Packet {
 
     private void init() {
         try {
-            setClazz(getMinecraftServerClass("PacketPlayOutRespawn"));
+            setClazz(ReflectionUtil.getMinecraftServerClass("PacketPlayOutRespawn"));
             Object packet = getClazz().getConstructor().newInstance();
             setPacket(packet);
         } catch (InstantiationException e) {

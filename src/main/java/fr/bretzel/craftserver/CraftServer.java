@@ -1,8 +1,8 @@
 package fr.bretzel.craftserver;
 
 import com.mojang.authlib.GameProfile;
+import fr.bretzel.craftserver.util.ReflectionUtil;
 import fr.bretzel.minecraftserver.MinecraftServer;
-import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -25,17 +25,10 @@ public class CraftServer {
         this.server = server;
         this.opLevel = 4;
         try {
-            commandsConfiguration = (YamlConfiguration) server.getClass().getDeclaredField("commandsConfiguration").get(server);
+            commandsConfiguration = (YamlConfiguration) ReflectionUtil.getFiel("commandsConfiguration", server.getClass()).get(server);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
         }
-    }
-
-    public static String getBukkitVersion() {
-        String packageName = Bukkit.getServer().getClass().getPackage().getName();
-        return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 
     public boolean getCommandBlockOverride(String command) {
@@ -45,13 +38,11 @@ public class CraftServer {
     public void addOp(GameProfile gameProfile) {
         try {
             Object  playerList = server.getClass().getDeclaredField("playerList").get(server.getClass());
-            Method addop = playerList.getClass().getMethod("addOp", GameProfile.class);
+            Method addop = ReflectionUtil.getMethod("addOp", playerList.getClass(), GameProfile.class);
             addop.invoke(playerList.getClass(), gameProfile);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
@@ -60,23 +51,5 @@ public class CraftServer {
 
     public Server getServer() {
         return server;
-    }
-
-    public Class<?> getMinecraftServerClass(String name) {
-        try {
-            return Class.forName("net.minecraft.server." + getBukkitVersion() + "." + name);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public Class getCraftBukkitClass(String name) {
-        try {
-            return Class.forName("org.bukkit.craftbukkit." + getBukkitVersion() + "." + name);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }
