@@ -24,7 +24,7 @@ public class ReflectionUtil {
             if (m.getName().equals(name) && m.getParameterTypes().length == parm.length) {
                 int i = 0;
                 for (Class<?> type : m.getParameterTypes()) {
-                    Class<?> c = parm[1];
+                    Class<?> c = parm[i];
                     if (type.toString().equals(c.toString())) {
                         return m;
                     }
